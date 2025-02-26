@@ -11,6 +11,7 @@ def _(df):
         .groupby('CountryCode')
         .agg(
             impressions = ('Impressions', 'sum'),
+            euros = ('Spend_Euros', 'sum'),
             campaigns = ('ADID', 'count')
         )
         .sort_values('campaigns', ascending=False)
@@ -18,6 +19,45 @@ def _(df):
 
     countries_table
     return (countries_table,)
+
+
+@app.cell
+def _(countries_table, df):
+    (
+        df
+        .groupby('CountryCode')
+        .Impressions
+        .describe()
+        .loc[ countries_table.index.to_list() ]
+    )
+    return
+
+
+@app.cell
+def _(countries_table, df):
+    (
+        df
+        .groupby('CountryCode')
+        .Spend_Euros
+        .describe()
+        .loc[ countries_table.index.to_list() ]
+    )
+    return
+
+
+@app.cell
+def _(countries_table, df):
+    (
+        df
+        .assign(
+            cpi = lambda df_: df_.Spend_Euros / df_.Impressions
+        )
+        .groupby('CountryCode')
+        .cpi
+        .describe()
+        .loc[ countries_table.index.to_list() ]
+    )
+    return
 
 
 @app.cell
@@ -47,7 +87,7 @@ def _(df):
         df
         #.query('`Currency Code`=="EUR"')
         .assign(
-            StartDate = lambda df: df.StartDate.dt.to_period('m')
+            StartDate = lambda df: df.StartDate.dt.to_period('d')
         )
         .pivot_table(
             index = 'StartDate',
@@ -107,14 +147,29 @@ def _(countries_table):
 
 
 @app.cell
+def _(countries_table):
+    (
+        countries_table
+        .plot
+        .scatter(
+            x = 'Spends_Eu',
+            y = 'impressions',
+        )
+    )
+    return
+
+
+@app.cell
 def _(df):
     (
         df
         .query('`Currency Code` == "EUR"')
+        .query('CountryCode.isin(["norway", "sweden" , "france"])')
         .plot
         .scatter(
-            x = 'Spend',
+            x = 'Spend_Euros',
             y = 'Impressions',
+            #color = 'CountryCode',
             figsize=(15,10)
         )
     )
@@ -125,7 +180,7 @@ def _(df):
 def _(pd):
     df = (
         pd
-        .read_csv('https://codeberg.org/dsa-datasprint-2025/notebooks/raw/branch/main/datasets/politicalads-2018-2025.csv')
+        .read_csv('https://codeberg.org/dsa-datasprint-2025/notebooks/raw/branch/main/datasets/politicalads-2018-20250212-alleuros.csv')
         .assign(
             StartDate = lambda df: pd.to_datetime(df.StartDate),
             EndDate = lambda df: pd.to_datetime(df.EndDate)
