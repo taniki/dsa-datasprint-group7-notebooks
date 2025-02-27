@@ -56,7 +56,7 @@ def _(mo):
 def _(pd):
     df = (
         pd
-        .read_csv('https://codeberg.org/dsa-datasprint-2025/notebooks/raw/branch/main/datasets/politicalads-2018-20250212-alleuros.csv')
+        .read_csv('https://raw.githubusercontent.com/taniki/dsa-datasprint-group7-notebooks/refs/heads/main/datasets/politicalads-2018-20250212-alleuros.csv')
         .assign(
             StartDate = lambda df: pd.to_datetime(df.StartDate),
             EndDate = lambda df: pd.to_datetime(df.EndDate)
