@@ -1,31 +1,43 @@
 import marimo
 
 __generated_with = "0.11.7"
-app = marimo.App(width="medium")
+app = marimo.App(width="full")
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
     mo.md("""# metrics by country""")
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(df, metrics_radio, mo):
-
     table = (
         df
         .groupby('CountryCode')
         [ metrics_radio.value ]
-        .describe()
-        .sort_values('count', ascending=False)
+        .agg(['count', 'sum', 'mean', 'std', 'median'])
+        .sort_values('mean', ascending=False)
+    )
+
+    def format_float(x):
+        return '{:.2f}'.format(x) if metrics_radio.value != 'cost_per_impression' else '{:.4f}'.format(x)
+
+    table_ui = mo.ui.table(
+        table,
+        selection=None,
+        format_mapping={
+            'mean': format_float,
+            'std': format_float,
+            'median': format_float,
+        }
     )
 
     mo.hstack([
         metrics_radio,
-        table
+        table_ui
     ])
-    return (table,)
+    return format_float, table, table_ui
 
 
 @app.cell
