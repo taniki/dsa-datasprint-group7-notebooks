@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.11.7"
+__generated_with = "0.11.0"
 app = marimo.App(width="medium")
 
 
@@ -98,6 +98,7 @@ def _(Spend_Euros, df, pd):
 @app.cell
 def _(df_final):
     df_final.to_csv('datasets/politicalads-2018-20250212-alleuros.csv')
+    df_final.to_parquet('datasets/politicalads-2018-20250212-alleuros.par')
     return
 
 
